@@ -1,0 +1,384 @@
+---
+pagetitle: "Portfolio"
+params: 
+  site_number: "03151600"
+  start_date: "2023-03-01"
+  end_date: "2023-03-01"
+output: 
+  flexdashboard::flex_dashboard:
+    css: ../css/style.css
+    orientation: rows
+    vertical_layout: fill
+---
+
+<link rel="shortcut icon" href="../image/favicon.png" />
+
+```{r clear-environment-variables-and-memory-usage, message = F, warning = F, echo = F}
+rm(list = setdiff(ls(), c("params", "render_portfolio")))
+invisible(gc(full = TRUE))
+```
+
+```{r import-libraries-and-functions, message = F, echo = F, warning = F}
+# Set global knitr chunk options
+knitr::opts_chunk$set(message = F, warning = F, echo = F, fig.align = 'center')
+# Load the local package
+devtools::load_all()
+library(ggplot2)
+library(plotly)
+library(leaflet)
+```
+
+```{r fetch-gage-data}
+
+# Retrieve from NWIS
+site <- fetch_gage_data(
+  site_number = params$site_number,
+  start_date = params$start_date,
+  end_date = params$end_date
+)
+
+# Time series
+site_data <- site$data
+
+# Metadata
+site_metadata <- site$metadata
+
+# sf geometry for mapping
+site_coords <- site_metadata %>%
+  # Add sf geometry for mapping
+  sf::st_as_sf(coords = c("dec_lon_va", "dec_lat_va")) %>%
+  sf::st_set_crs(4326)
+```
+
+```{r fetch-precipitation-data}
+weather_data <- fetch_weather_data(lat = site_metadata$dec_lat_va,
+                                   lon = site_metadata$dec_lon_va,
+                                   start_date = params$start_date,
+                                   end_date = params$end_date) 
+
+# Calculate mean daily temperature
+temp_data <- weather_data %>%
+  dplyr::mutate(day = lubridate::floor_date(datetime_local, "day")) %>%
+  dplyr::group_by(day) %>%
+  dplyr::summarise(daily_temp_degF = mean(temp_degF, na.rm = TRUE),
+                   sd = sd(temp_degF, na.rm = TRUE)) %>%
+  dplyr::ungroup() %>%
+  tidyr::drop_na() %>%
+  dplyr::mutate(upper_error = daily_temp_degF + sd,
+                lower_error = daily_temp_degF - sd)
+```
+
+```{r calculate-depth-from-flow}
+# Calculate linear rating curve
+rating_curve <-
+  calculate_linear_rating_curve(
+    site_number = params$site_number,
+    start_date = params$start_date,
+    end_date = params$end_date
+  )
+
+# Apply rating curve to gage height data
+site_data <- site_data %>%
+  dplyr::mutate(depth_ft = rating_curve$slope * gage_height_ft + rating_curve$int)
+```
+
+```{r caclulate-water-volume}
+water_volume <- site_data %>%
+  dplyr::mutate(
+      interval = as.numeric(datetime_local - dplyr::lag(datetime_local), units = "secs"),
+      volume_per_interval = (flow_cfs * interval) / 7.481
+    ) %>%
+    # Sum all volumes at each interval to get total volume
+    dplyr::summarise(total_volume_cubic_feet = plyr::round_any(
+      x = sum(volume_per_interval, na.rm = TRUE),
+      accuracy = 100,
+      f = ceiling
+    )) %>%
+    dplyr::ungroup() %>%
+  format(., big.mark = ",") %>%
+  dplyr::pull()
+```
+
+```{r rain-volume}
+rain_volume <- weather_data %>%
+  dplyr::summarise(rain_volume = sum(precipitation_in, na.rm = TRUE)) %>%
+  round(., 1) %>%
+  dplyr::pull()
+```
+
+```{r plot-site-on-map}
+site_map <- 
+  leaflet() %>%
+  # Scale bar
+  leaflet::addScaleBar(position = "bottomright") %>%
+  # Base maps
+  addProviderTiles(providers$Esri.WorldImagery, group = "Satellite") %>%
+  addProviderTiles(providers$CartoDB.Voyager, group = "Streets") %>%
+  addLayersControl(
+    baseGroups = c("Streets", "Satellite"),
+    options = layersControlOptions(collapsed = FALSE)
+  ) %>%
+  addCircleMarkers(
+    data = site_coords$geometry,
+    weight = 1,
+    fillColor = '#00b3f4',
+    fillOpacity = 0.5,
+    radius = 13,
+    stroke = FALSE
+    ) %>%
+  addCircleMarkers(
+    data = site_coords$geometry,
+    fillColor = '#00b3f4',
+    fillOpacity = 0.8,
+    radius = 8,
+    stroke = FALSE,
+    label = site_metadata$station_nm,
+    labelOptions = labelOptions(
+      style = list("box-shadow" = "3px 3px rgba(0,0,0,0.25)",
+                   "font-size" = "11px")
+    )
+  )
+```
+
+```{r plot-precip}
+precip_plot <-
+  weather_data %>%
+  ggplot() +
+  geom_linerange(
+    aes(
+      x = datetime_local,
+      ymax = precipitation_in,
+      ymin = 0,
+      text = paste0(
+        'Date: ',
+        format(datetime_local, '%B %d, %Y'),
+        '\n',
+        'Time: ',
+        format(datetime_local, '%H:%M %Z'),
+        '\n',
+        'Rainfall: ',
+        round(precipitation_in),
+        ' in'
+      )
+    ),
+    group = 1,
+    color = 'grey'
+  ) +
+  labs(x = ' ',
+       y = 'Rainfall (in)') +
+  theme_classic() 
+
+precip_plotly <- ggplotly(precip_plot, tooltip = 'text')
+```
+
+```{r plot-temp}
+temp_plot <-
+  temp_data %>%
+  ggplot() +
+  geom_ribbon(
+    group = 1,
+    aes(x = day,
+        ymax = upper_error,
+        ymin = lower_error),
+    alpha = 0.3,
+    fill = '#A4B584'
+  ) +
+  geom_line(
+    aes(
+      x = day,
+      y = daily_temp_degF,
+      text = paste0(
+        format(day, '%B %d, %Y'),
+        '\n',
+        'Air Temperature: ',
+        round(daily_temp_degF),
+        ' °C'
+      )
+    ),
+    group = 1,
+    color = '#A4B584'
+  ) +
+  labs(x = ' ',
+       y = 'Air Temerpature (°C)') +
+  theme_classic() 
+
+temp_plotly <- ggplotly(temp_plot, tooltip = 'text')
+```
+
+```{r plot-flow}
+depth_plot <-
+  site_data %>%
+  ggplot() +
+  geom_ribbon(
+    group = 1,
+    aes(x = datetime_local,
+        ymax = depth_ft),
+    min = 0,
+    alpha = 0.3,
+    fill = '#B584A4'
+  ) +
+  geom_line(
+    aes(
+      x = datetime_local,
+      y = depth_ft,
+      text = paste0(
+        'Date: ',
+        format(datetime_local, '%B %d, %Y'),
+        '\n',
+        'Time: ',
+        format(datetime_local, '%H:%M %Z'),
+        '\n',
+        'Depth: ',
+        round(depth_ft, 2),
+        ' ft'
+      )
+    ),
+    group = 1,
+    color = '#B584A4'
+  ) +
+  labs(x = ' ',
+       y = 'Depth (ft)') +
+  theme_classic() +
+  theme(legend.position = 'none') 
+
+depth_plotly <- ggplotly(depth_plot, tooltip = 'text')
+```
+
+```{r plot-depth}
+flow_plot <-
+  site_data %>%
+  ggplot() +
+  geom_ribbon(
+    group = 1,
+    aes(x = datetime_local,
+        ymax = flow_cfs),
+    min = 0,
+    alpha = 0.3,
+    fill = '#84a4b5'
+  ) +
+  geom_line(
+    aes(
+      x = datetime_local,
+      y = flow_cfs,
+      text = paste0(
+        'Date: ',
+        format(datetime_local, '%B %d, %Y'),
+        '\n',
+        'Time: ',
+        format(datetime_local, '%H:%M %Z'),
+        '\n',
+        'Flow: ',
+        round(flow_cfs, 2),
+        ' cfs'
+      )
+    ),
+    group = 1,
+    color = '#84a4b5'
+  ) +
+  labs(x = ' ',
+       y = 'Flow (cfs)') +
+  theme_classic() +
+  theme(legend.position = 'none') 
+
+flow_plotly <- ggplotly(flow_plot, tooltip = 'text')
+```
+
+```{r captions}
+site_caption <- paste0("Stream data retrieved from <a href = 'https://waterdata.usgs.gov/nwis?'>National Water Information System</a> via <a href = 'https://github.com/DOI-USGS/dataRetrieval'>dataRetrieval</a>")
+
+weather_caption <- paste0("Weather data retrieved from <a href = 'https://open-meteo.com/'>Open Meteo</a>")
+```
+
+Row {data-width = 650}
+-------------------------------------
+
+### current stream gage
+
+```{r box-1}
+flexdashboard::valueBox(site_metadata$station_nm,
+                        icon = "ion-ios-location",
+                        color =  'white')
+```
+
+### cubic feet of stream water
+
+```{r box-2}
+flexdashboard::valueBox(water_volume,
+                        icon = "ion-ios-analytics",
+                        color =  'white')
+```
+
+### inches of rainfall accumulation
+
+```{r box-3}
+flexdashboard::valueBox(rain_volume,
+                        icon = "ion-waterdrop",
+                        color =  'white')
+```
+
+Row 
+-------------------------------------
+
+### SITE MAP 
+
+```{r rint-map}
+site_map
+```
+
+### CONDITIONS
+
+```{r condition-plots, out.width = '100%', fig.height = 10}
+subplot(depth_plotly,
+        flow_plotly,
+        nrows = 2,
+        shareX = TRUE,
+        titleY = TRUE,
+  heights = c(0.5, 0.5)) %>%
+  plotly::layout(
+      margin = list(b = 70),
+      annotations =
+        list(
+          x = 0.5,
+          y = -0.15,
+          text = site_caption,
+          showarrow = F,
+          xref = 'paper',
+          yref = 'paper',
+          xanchor = 'center',
+          yanchor = 'auto',
+          xshift = 0,
+          yshift = 0,
+          font = list(size = 9,
+                      color = '#919191')
+        )
+    )
+```
+
+### WEATHER
+
+```{r weather-plots, out.width = '100%', fig.height = 10}
+subplot(temp_plotly,
+        precip_plotly,
+        nrows = 2,
+        shareX = TRUE,
+        titleY = TRUE,
+  heights = c(0.5, 0.5)) %>%
+  plotly::layout(
+      margin = list(b = 70),
+      annotations =
+        list(
+          x = 0.5,
+          y = -0.15,
+          text = weather_caption,
+          showarrow = F,
+          xref = 'paper',
+          yref = 'paper',
+          xanchor = 'center',
+          yanchor = 'auto',
+          xshift = 0,
+          yshift = 0,
+          font = list(size = 9,
+                      color = '#919191')
+        )
+    )
+```
