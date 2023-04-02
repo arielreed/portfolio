@@ -10,6 +10,9 @@
 *.yml
 *.html
 
+# Except /docs
+!/docs/*.html
+
 # Example code in package build process
 *-Ex.R
 
