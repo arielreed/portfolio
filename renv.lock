@@ -563,6 +563,28 @@
       "Repository": "RSPM",
       "Hash": "f7736a18de97dea803bde0a2daaafb27"
     },
+    "flexdashboard": {
+      "Package": "flexdashboard",
+      "Version": "0.6.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "bslib",
+        "grDevices",
+        "htmltools",
+        "htmlwidgets",
+        "jsonlite",
+        "knitr",
+        "rmarkdown",
+        "sass",
+        "scales",
+        "shiny",
+        "tools",
+        "utils"
+      ],
+      "Hash": "66aa31fb4b18c053cd20753523073742"
+    },
     "fontawesome": {
       "Package": "fontawesome",
       "Version": "0.5.0",
@@ -1229,6 +1251,17 @@
         "viridisLite"
       ],
       "Hash": "3781cf6971c6467fa842a63725bbee9e"
+    },
+    "plyr": {
+      "Package": "plyr",
+      "Version": "1.8.8",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "Rcpp"
+      ],
+      "Hash": "d744387aef9047b0b48be2933d78e862"
     },
     "png": {
       "Package": "png",
