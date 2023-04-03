@@ -38,5 +38,5 @@ render_portfolio(site_number = "04213000", start_date = "2022-01-01", end_date =
 ```
 
 #### The Final Product:
-![image](https://user-images.githubusercontent.com/52611343/229255123-62d7a5b0-8fdf-4011-a3a1-a5425df2a1a1.png)
+![image](https://user-images.githubusercontent.com/52611343/229561793-9f24d49b-8e0b-4b59-9438-3a2036a4139f.png)
 
