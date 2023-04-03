@@ -68,7 +68,7 @@ temp_data <- weather_data %>%
                 lower_error = daily_temp_degF - sd)
 ```
 
-```{r calculate-depth-from-flow}
+```{r calculate-depth-from-stage}
 # Calculate linear rating curve
 rating_curve <-
   calculate_linear_rating_curve(
@@ -157,7 +157,7 @@ precip_plot <-
         format(datetime_local, '%H:%M %Z'),
         '\n',
         'Rainfall: ',
-        round(precipitation_in),
+        round(precipitation_in, 2),
         ' in'
       )
     ),
@@ -192,14 +192,14 @@ temp_plot <-
         '\n',
         'Air Temperature: ',
         round(daily_temp_degF),
-        ' °C'
+        ' °F'
       )
     ),
     group = 1,
     color = '#A4B584'
   ) +
   labs(x = ' ',
-       y = 'Air Temerpature (°C)') +
+       y = 'Air Temerpature (°F)') +
   theme_classic() 
 
 temp_plotly <- ggplotly(temp_plot, tooltip = 'text')
