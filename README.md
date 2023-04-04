@@ -12,9 +12,9 @@ A flashy display of my data science prowess
 4. Run `renv::restore()` to download all dependencies
 5. Load the portfolio package by running `devtools::load_all()`
 
-## Generate My Portfolio
+## Render My Portfolio
 
-1. Run `render_portfolio()`.
+1. Run `render_portfolio()` in the R console.
 2. The output is rendered in `/inst/output/`.
 
 **Choose your own adventure when rendering my portfolio:**
@@ -22,8 +22,8 @@ A flashy display of my data science prowess
 |---|---|
 | `site_number` | &#8226; A USGS stream gage number.<br>&#8226; Explore stream gages on the [National Water Information System](https://maps.waterdata.usgs.gov/mapper/index.html) web interface.<br>&#8226; A random, eligible site is selected when not specified by user. |
 | `state` | &#8226; A two letter abbreviation for a US state, e.g. `"CO"`<br>&#8226; Provide when you want a random stream gage selected within the given state. |
-| `start_date` | &#8226; First day of data to be displayed in portfolio.<br>&#8226; Provide as `"YYYY-mm_dd"`, otherwise 1 month prior to today will be used. |
-| `end_date` | &#8226; Last day of data to be displayed in portfolio.<br>&#8226; Provide as `"YYYY-mm_dd"`, otherwise today will be used. |
+| `start_date` | &#8226; First day of data to be displayed in portfolio.<br>&#8226; Provide as `"YYYY-mm-dd"`, otherwise 1 month prior to today will be used. |
+| `end_date` | &#8226; Last day of data to be displayed in portfolio.<br>&#8226; Provide as `"YYYY-mm-dd"`, otherwise today will be used. |
 
 #### Examples:
 ```r
