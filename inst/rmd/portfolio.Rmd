@@ -1,9 +1,9 @@
 ---
 pagetitle: "Portfolio"
 params: 
-  site_number: "03151600"
-  start_date: "2023-03-01"
-  end_date: "2023-03-01"
+  site_number: 
+  start_date: 
+  end_date:
 output: 
   flexdashboard::flex_dashboard:
     css: ../css/style.css
@@ -300,7 +300,7 @@ flexdashboard::valueBox(site_metadata$station_nm,
                         color =  'white')
 ```
 
-### cubic feet of stream water
+### gallons of stream water
 
 ```{r box-2}
 flexdashboard::valueBox(water_volume,
