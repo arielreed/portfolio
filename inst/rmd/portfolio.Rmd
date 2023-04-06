@@ -382,3 +382,7 @@ subplot(temp_plotly,
         )
     )
 ```
+
+Row {data-height=15}
+-------------------------------------
+<div class='footer-div'><span class='footer'>View source code on <a href='https://github.com/arielreed/portfolio'>Github</a></span></div>
