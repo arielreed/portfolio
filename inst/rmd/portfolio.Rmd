@@ -199,7 +199,7 @@ temp_plot <-
     color = '#A4B584'
   ) +
   labs(x = ' ',
-       y = 'Air Temerpature (°F)') +
+       y = 'Air Temperature (°F)') +
   theme_classic() 
 
 temp_plotly <- ggplotly(temp_plot, tooltip = 'text')
