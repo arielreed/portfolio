@@ -1,7 +1,7 @@
 # :chart_with_upwards_trend: Portfolio
 A flashy display of my data science prowess
 ## System Requirements
-   - [R 4.2.2](https://cran.r-project.org/bin/windows/base/old/)
+   - [R 4.2.3](https://cran.r-project.org/bin/windows/base/old/)
    - [Rtools 4.2](https://cran.r-project.org/bin/windows/Rtools/)
    - [RStudio](https://posit.co/download/rstudio-desktop/)
    
