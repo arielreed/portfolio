@@ -32,7 +32,7 @@ jobs:
         git remote set-url origin git@github.com:arielreed/portfolio.git
         git checkout main
 
-        cp inst/portfolio-06752260.html docs/index.html
+        cp inst/output/portfolio-06752260.html docs/index.html
         git add docs/index.html
         git commit -m '[CI] Auto update portfolio' || exit 0
         git push
