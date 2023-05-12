@@ -1408,8 +1408,7 @@
         "R",
         "Rcpp",
         "methods",
-        "sp",
-        "terra"
+        "sp"
       ],
       "Hash": "ebebd9f0f203a129eb2da96470191b82"
     },
@@ -1775,18 +1774,6 @@
         "cpp11"
       ],
       "Hash": "90b28393209827327de889f49935140a"
-    },
-    "terra": {
-      "Package": "terra",
-      "Version": "1.7-18",
-      "Source": "Repository",
-      "Repository": "RSPM",
-      "Requirements": [
-        "R",
-        "Rcpp",
-        "methods"
-      ],
-      "Hash": "5db3d690ad42a1828d3bf9e063c98587"
     },
     "testthat": {
       "Package": "testthat",
