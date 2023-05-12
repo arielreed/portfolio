@@ -38,6 +38,6 @@ render_portfolio(site_number = "04213000", start_date = "2022-01-01", end_date =
 ```
 
 #### The Final Product:
-![image](https://github.com/arielreed/portfolio/assets/52611343/799955c5-67f0-46c1-9d0c-1e95a22bb785)
+![image](https://github.com/arielreed/portfolio/assets/52611343/136b7fb5-e9fa-4561-b7ef-f833cdbbd2d1)
 
 
