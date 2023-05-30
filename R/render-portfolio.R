@@ -9,12 +9,15 @@
 #' @param start_date Optional. Provide as \code{"YYYY-mm_dd"}, otherwise 1 month
 #' prior to today will be used.
 #' @param end_date Optional. Provide as \code{"YYYY-mm-dd"}, otherwise today will be used.
+#' @param shiny Logical. Should the portfolio be rendered as an R Shiny app?
+#' Default is \code{FALSE}.
 #' @returns HTML report in the \code{/inst/outputs/} directory of this repository.
 #' 
 render_portfolio <- function(site_number = NULL,
                              state = NULL,
                              start_date = NULL,
-                             end_date = NULL) {
+                             end_date = NULL,
+                             shiny = FALSE) {
 
   # If start and end dates are not provided, default to the past month of data
   if (is.null(start_date)) start_date <- Sys.Date() - 30
@@ -50,25 +53,36 @@ render_portfolio <- function(site_number = NULL,
       ) 
     
     # Select random site
-    site <- sample(intersect(flow_sites$site_no, stage_sites$site_no), 1)
+    # Otherwise, use user provided site number(s)
+    site <- sample(intersect(flow_sites$site_no, stage_sites$site_no), 
+                   ifelse(isTRUE(shiny), 3, 1))
   } else {
     site <- site_number
   }
   
-  message(paste0("Rendering portfolio for stream gage ", site))
-  
-  # Render portfolio
-  rmarkdown::render(
-    input = here::here("inst", "rmd", "portfolio.Rmd"),
-    output_dir = here::here("inst", "output"),
-    output_file = paste0("portfolio-",
-                         site,
-                         ".html"),
-    params = list(
-      site_number = site,
-      start_date = start_date,
-      end_date = end_date
-    ),
-    envir = parent.frame()
-  )
+  # Render shiny or Rmarkdown portfolio
+  if (isTRUE(shiny)) {
+    rmarkdown::run(
+      file = here::here("inst", "rmd", "shiny-portfolio.rmd"),
+      render_args = list(params = list(
+        site_number = site,
+        start_date = start_date,
+        end_date = end_date
+      )))
+  } else {
+    # Render Rmarkdown portfolio
+    rmarkdown::render(
+      input = here::here("inst", "rmd", "portfolio.Rmd"),
+      output_dir = here::here("inst", "output"),
+      output_file = paste0("portfolio-",
+                           site,
+                           ".html"),
+      params = list(
+        site_number = site,
+        start_date = start_date,
+        end_date = end_date
+      ),
+      envir = parent.frame()
+    )
+  }
 }

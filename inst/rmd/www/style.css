@@ -1,0 +1,10 @@
+body {
+    max-width: 1920px !important;
+    display: block;
+    margin: auto;
+    padding-top:0px !important
+}
+
+.navbar-inverse {
+   display: none !important;
+}

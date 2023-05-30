@@ -8,7 +8,8 @@ render_portfolio(
   site_number = NULL,
   state = NULL,
   start_date = NULL,
-  end_date = NULL
+  end_date = NULL,
+  shiny = FALSE
 )
 }
 \arguments{
@@ -23,6 +24,9 @@ Only provide if \code{site_number} is not given.}
 prior to today will be used.}
 
 \item{end_date}{Optional. Provide as \code{"YYYY-mm-dd"}, otherwise today will be used.}
+
+\item{shiny}{Logical. Should the portfolio be rendered as an R Shiny app?
+Default is \code{FALSE}.}
 }
 \value{
 HTML report in the \code{/inst/outputs/} directory of this repository.

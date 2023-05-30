@@ -4,12 +4,13 @@
 \alias{fetch_weather_data}
 \title{Fetch Weather Data From Open Meteo}
 \usage{
-fetch_weather_data(lat, lon, start_date, end_date)
+fetch_weather_data(site_metadata, start_date, end_date)
 }
 \arguments{
-\item{lat}{Latitude.}
-
-\item{lon}{Longitude.}
+\item{site_metadata}{A data frame containing the columns \code{site_number,
+lat, lon} where \code{site_number} corresponds to the USGS site number,
+\code{lat} to the latitudinal coordinate of the given site and \code{lon}
+to the longitudinal coordinate of the given site.}
 
 \item{start_date}{Start date, provide as \code{"YYYY-mm-dd"}.}
 
