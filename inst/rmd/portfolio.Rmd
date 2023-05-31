@@ -333,7 +333,7 @@ subplot(depth_plotly,
         titleY = TRUE,
   heights = c(0.5, 0.5)) %>%
   plotly::layout(
-      margin = list(b = 70),
+      margin = list(b = 100),
       annotations =
         list(
           x = 0.5,
@@ -362,7 +362,7 @@ subplot(temp_plotly,
         titleY = TRUE,
   heights = c(0.5, 0.5)) %>%
   plotly::layout(
-      margin = list(b = 70),
+      margin = list(b = 100),
       annotations =
         list(
           x = 0.5,
