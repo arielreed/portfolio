@@ -287,7 +287,7 @@ site_caption <- paste0("Stream data retrieved from <a href = 'https://waterdata.
 weather_caption <- paste0("Weather data retrieved from <a href = 'https://open-meteo.com/'>Open Meteo</a>")
 ```
 
-Row {data-width = 650}
+Row
 -------------------------------------
 
 ### current stream gage

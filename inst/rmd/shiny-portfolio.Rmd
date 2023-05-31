@@ -164,7 +164,7 @@ rainVolume <- shiny::reactive({
 })
 ```
 
-Row {data-width = 650}
+Row
 -------------------------------------
 
 ### current stream gage
@@ -325,7 +325,7 @@ subplot(depth_plotly,
         titleY = TRUE,
   heights = c(0.5, 0.5)) %>%
   plotly::layout(
-      margin = list(b = 70),
+      margin = list(b = 100),
       annotations =
         list(
           x = 0.5,
@@ -424,7 +424,7 @@ renderPlotly({
     heights = c(0.5, 0.5)
   ) %>%
     plotly::layout(
-      margin = list(b = 70),
+      margin = list(b = 100),
       annotations =
         list(
           x = 0.5,
@@ -444,3 +444,7 @@ renderPlotly({
   
 })
 ```
+
+Row {data-height=10}
+-------------------------------------
+<div class='footer-div'><span class='footer'>View source code on <a href='https://github.com/arielreed/portfolio'>Github</a></span></div>

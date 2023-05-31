@@ -8,3 +8,15 @@ body {
 .navbar-inverse {
    display: none !important;
 }
+
+.footer-div {
+    display: block;
+    width: 100%;
+}
+
+.footer {
+    font-size: 12px;
+    text-align: right;
+    display: block;
+    padding-right: 12px;
+}
