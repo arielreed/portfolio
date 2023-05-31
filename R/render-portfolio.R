@@ -10,8 +10,8 @@
 #' prior to today will be used.
 #' @param end_date Optional. Provide as \code{"YYYY-mm-dd"}, otherwise today will be used.
 #' @param shiny Logical. Should the portfolio be rendered as an R Shiny app?
-#' Default is \code{FALSE}.
-#' @returns HTML report in the \code{/inst/outputs/} directory of this repository.
+#' Default is \code{FALSE} which renders the portfolio in Rmarkdown format.
+#' @returns Portfolio in Rmarkdown or Shiny format.
 #' 
 render_portfolio <- function(site_number = NULL,
                              state = NULL,
@@ -70,6 +70,8 @@ render_portfolio <- function(site_number = NULL,
         end_date = end_date
       )))
   } else {
+    # Check that only one stream gage is provided
+    if (length(site) > 1) stop("Invalid parameters. Either set shiny = TRUE or provide only ONE gage station.")
     # Render Rmarkdown portfolio
     rmarkdown::render(
       input = here::here("inst", "rmd", "portfolio.Rmd"),
