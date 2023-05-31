@@ -35,7 +35,7 @@ render_portfolio()
 # Renders an Rmarkdown portfolio using a random USGS stream gage located in Colorado, USA and displays the past 1 month of data.
 render_portfolio(state = "CO")
 
-# Renders am Rmarkdwon portfolio for stream gage 04213000 and displays all data from 2022.
+# Renders an Rmarkdwon portfolio for stream gage 04213000 and displays all data from 2022.
 render_portfolio(site_number = "04213000", start_date = "2022-01-01", end_date = "2022-12-31")
 
 # Renders an R Shiny portfolio using three random stream gages in Colorado.
