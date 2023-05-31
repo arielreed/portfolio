@@ -11,7 +11,7 @@ output:
     vertical_layout: fill
 ---
 
-<link rel="shortcut icon" href="../image/favicon.png" />
+<link rel="shortcut icon" href="../image/favicon.ico" />
 
 ```{r clear-environment-variables-and-memory-usage, message = F, warning = F, echo = F}
 rm(list = setdiff(ls(), c("params", "render_portfolio")))
@@ -29,7 +29,6 @@ library(leaflet)
 ```
 
 ```{r fetch-gage-data}
-
 # Retrieve from NWIS
 site <- fetch_gage_data(
   site_number = params$site_number,
@@ -51,8 +50,7 @@ site_coords <- site_metadata %>%
 ```
 
 ```{r fetch-precipitation-data}
-weather_data <- fetch_weather_data(lat = site_metadata$dec_lat_va,
-                                   lon = site_metadata$dec_lon_va,
+weather_data <- fetch_weather_data(site_metadata = site_metadata,
                                    start_date = params$start_date,
                                    end_date = params$end_date) 
 
@@ -289,7 +287,7 @@ site_caption <- paste0("Stream data retrieved from <a href = 'https://waterdata.
 weather_caption <- paste0("Weather data retrieved from <a href = 'https://open-meteo.com/'>Open Meteo</a>")
 ```
 
-Row {data-width = 650}
+Row
 -------------------------------------
 
 ### current stream gage

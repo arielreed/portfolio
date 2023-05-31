@@ -11,55 +11,58 @@
 calculate_linear_rating_curve <- function(site_number,
                                           start_date,
                                           end_date) {
+  linear_model <- c()
   # Get field measurements from NWIS
-  fieldMeas <-
-    dataRetrieval::readNWISmeas(
-      siteNumbers = site_number,
-      startDate = as.Date(start_date) - lubridate::years(5),
-      endDate = as.Date(start_date),
-      tz = "UTC",
-      expand = TRUE
-    ) %>%
-    # Select columns for rating curve calculation
-    # Remove poor readings and negative values
-    dplyr::select(
-      site_no,
-      measured_rating_diff,
-      chan_discharge,
-      chan_width,
-      chan_velocity,
-      gage_height_va
-    ) %>%
-    dplyr::filter(measured_rating_diff != "Poor",
-                  dplyr::if_all(dplyr::where(is.numeric), ~ .x > 0)
-    ) %>%
+  for (i in site_number) {
+    fieldMeas <-
+      dataRetrieval::readNWISmeas(
+        siteNumbers = i,
+        startDate = as.Date(start_date) - lubridate::years(5),
+        endDate = as.Date(start_date),
+        tz = "UTC",
+        expand = TRUE
+      ) %>%
+      # Select columns for rating curve calculation
+      # Remove poor readings and negative values
+      dplyr::select(
+        site_no,
+        measured_rating_diff,
+        chan_discharge,
+        chan_width,
+        chan_velocity,
+        gage_height_va
+      ) %>%
+      dplyr::filter(measured_rating_diff != "Poor",
+                    dplyr::if_all(dplyr::where(is.numeric), ~ .x > 0)) %>%
+      
+      # Calculate channel depth from field measurements
+      dplyr::mutate(chan_depth_ft = chan_discharge / (chan_width * chan_velocity))
     
-    # Calculate channel depth from field measurements
-    dplyr::mutate(
-      chan_depth_ft = chan_discharge / (chan_width * chan_velocity)
-    )
-  
-  # Linear interpolation (y ~ x ::: depth ~ stage)
-  depthRating <- as.data.frame(fieldMeas) %>%
-    dplyr::group_by(site_no) %>%
-    dplyr::do(depthRating = broom::tidy(lm(chan_depth_ft ~ gage_height_va, data = .))) %>%
-    tidyr::unnest(depthRating) %>%
-    dplyr::ungroup()
-  
-  slope <- depthRating %>%
-    dplyr::filter(term == "gage_height_va") %>%
-    dplyr::select(site_no, estimate) %>%
-    dplyr::rename(slope = estimate) %>%
-    dplyr::ungroup()
-  
-  intercept <- depthRating %>%
-    dplyr::filter(term == "(Intercept)") %>%
-    dplyr::select(site_no, estimate) %>%
-    dplyr::rename(int = estimate)
-  
-  linear_model <- dplyr::full_join(slope, 
-                                   intercept,
-                                   by = "site_no") 
+    # Linear interpolation (y ~ x ::: depth ~ stage)
+    depthRating <- as.data.frame(fieldMeas) %>%
+      dplyr::group_by(site_no) %>%
+      dplyr::do(depthRating = broom::tidy(lm(chan_depth_ft ~ gage_height_va, data = .))) %>%
+      tidyr::unnest(depthRating) %>%
+      dplyr::ungroup()
+    
+    slope <- depthRating %>%
+      dplyr::filter(term == "gage_height_va") %>%
+      dplyr::select(site_no, estimate) %>%
+      dplyr::rename(slope = estimate) %>%
+      dplyr::ungroup()
+    
+    intercept <- depthRating %>%
+      dplyr::filter(term == "(Intercept)") %>%
+      dplyr::select(site_no, estimate) %>%
+      dplyr::rename(int = estimate)
+    
+    linear_model_i <- dplyr::full_join(slope,
+                                       intercept,
+                                       by = "site_no") %>%
+      dplyr::rename(site_number = site_no)
+    # Append all results into single data frame
+    linear_model <- rbind(linear_model_i, linear_model)
+  }
   
   return(linear_model)
 } 
