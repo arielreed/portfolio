@@ -1,10 +1,10 @@
 # :chart_with_upwards_trend: Portfolio
 A flashy display of my data science prowess
 ## System Requirements
-   - [R 4.3.0](https://cran.r-project.org/bin/windows/base/old/)
+   - [R 4.2.2](https://cran.r-project.org/bin/windows/base/old/)
    - [RStudio](https://posit.co/download/rstudio-desktop/)
    - [GDAL 3.7.0](https://gdal.org/download.html) (Leaflet dependency)
-   - [Rtools 4.3](https://cran.r-project.org/bin/windows/Rtools/) (Windows only)
+   - [Rtools 4.4](https://cran.r-project.org/bin/windows/Rtools/) (Windows only)
    
 ## R Environment
 1. Clone this repository `https://github.com/arielreed/portfolio.git`
